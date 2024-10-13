@@ -5,6 +5,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import StatisticsMenu from './components/StatisticsMenu'; // Nueva pantalla
+import Register from './components/Register';
 
 
 // Crea el Stack Navigator
@@ -21,6 +22,7 @@ export default function App() {
       <StatusBar style="auto" />
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen options={{ headerShown: false }}   name="Login" component={Login} />
+        <Stack.Screen options={{ headerShown: false }}   name="Register" component={Register} />
         <Stack.Screen options={{ headerShown: false }}   name="StatisticsMenu" component={StatisticsMenu} />
       </Stack.Navigator>
     </NavigationContainer>
