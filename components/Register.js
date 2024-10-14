@@ -55,7 +55,7 @@ const Register = () => {
 
         // Redirigir al login después de un breve tiempo
         setTimeout(() => {
-          navigation.navigate('Login');
+          navigation.navigate('StatisticsMenu');
         }, 1500);  // Navegar después de 1.5 segundos
       })
       .catch((error) => {

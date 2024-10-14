@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { Text, View, TextInput, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, TextInput, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import ButtonGradient from './buttons/ButtonGradient';
 import ButtonGoogle from './buttons/ButtonGoogle';
 import { useNavigation } from '@react-navigation/native';
-//Estilos
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'; // Asegúrate de tener Firebase configurado
 import styles from '../styles/login.styles';
 
 const { width, height } = Dimensions.get('window');
@@ -57,6 +57,36 @@ const Login = () => {
   const navigation = useNavigation();  // Hook para navegar
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const auth = getAuth(); // Inicializa Firebase Auth
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // Si no hay usuario autenticado, limpiar los campos
+        setEmail('');
+        setPassword('');
+      }
+    });
+
+    // Limpieza al desmontar el componente
+    return () => unsubscribe();
+  }, [auth]);
+
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Ingreso exitoso
+        const user = userCredential.user;
+        console.log('Usuario autenticado:', user.email);
+        navigation.navigate('StatisticsMenu'); // Navega a la pantalla de estadísticas
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        Alert.alert('Error', "Cuenta Invàlida"); // Muestra un mensaje de error
+        console.error('Error al iniciar sesión:', errorCode, errorMessage);
+      });
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -66,16 +96,14 @@ const Login = () => {
       <View style={styles.container}>
         <Text style={styles.titulo}>Login</Text>
         <Text style={styles.subTitle}>Sign In to your account</Text>
-        
-        
+
         <TextInput 
           placeholder="orleis12@gmail.com"
           style={styles.textInput}
           value={email}
           onChangeText={setEmail}
         />
-        
-        
+
         <TextInput 
           placeholder="password"
           style={styles.textInput}
@@ -85,18 +113,15 @@ const Login = () => {
         />
         
         <Text style={styles.forgotPassword}>Forgot your password?</Text>
-        
-        
+
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
           <Text style={styles.forgotPassword}>Don't have an account? Create one</Text>
         </TouchableOpacity>
-        
-        
-        <ButtonGradient onPress={() => navigation.navigate('StatisticsMenu')} />
-        
+
+        <ButtonGradient onPress={handleLogin} />
         
         <ButtonGoogle />
-        
+
         <StatusBar style="auto" />
       </View>
     </View>
